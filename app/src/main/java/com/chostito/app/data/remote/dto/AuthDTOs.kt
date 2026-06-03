@@ -3,22 +3,28 @@ package com.chostito.app.data.remote.dto
 import com.google.gson.annotations.SerializedName
 
 data class LoginRequest(
-    val email: String,
-    val password: String
+    @SerializedName("Email") val email: String,
+    @SerializedName("Password") val password: String
 )
 
 data class RegisterRequest(
-    val nombre: String,
-    val email: String,
-    val password: String,
-    val telefono: String,
-    val rol: String
+    @SerializedName("Nombre") val nombre: String,
+    @SerializedName("Email") val email: String,
+    @SerializedName("Password") val password: String,
+    @SerializedName("Telefono") val telefono: String,
+    @SerializedName("Rol") val rol: String
 )
 
 data class LoginResponseDto(
-    val token: String? = null,
-    val usuario: UserDto? = null,
-    val mensaje: String? = null
+    @SerializedName("Token") val token: String? = null,
+    @SerializedName("Id") val id: Int? = null,
+    @SerializedName("Nombre") val nombre: String? = null,
+    @SerializedName("Email") val email: String? = null,
+    @SerializedName("Telefono") val telefono: String? = null,
+    @SerializedName("Rol") val rol: String? = null,
+    @SerializedName("FotoUrl") val fotoUrl: String? = null,
+    @SerializedName("FechaRegistro") val fechaRegistro: String? = null,
+    @SerializedName("Mensaje") val mensaje: String? = null
 )
 
 data class UserDto(
@@ -31,11 +37,11 @@ data class UserDto(
 )
 
 data class PasswordResetRequest(
-    val email: String
+    @SerializedName("Email") val email: String
 )
 
 data class PasswordResetConfirmRequest(
-    val email: String,
-    val token: String,
-    val newPassword: String
+    @SerializedName("Email") val email: String,
+    @SerializedName("Token") val token: String,
+    @SerializedName("NewPassword") val newPassword: String
 )

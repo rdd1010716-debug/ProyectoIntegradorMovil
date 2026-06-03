@@ -64,12 +64,32 @@ class AuthViewModel @Inject constructor(
 
     fun saveServerUrl(url: String) {
         viewModelScope.launch {
-            val formattedUrl = if (url.startsWith("http")) url else "http://$url"
-            dataStoreManager.saveServerUrl(formattedUrl)
-            sessionManager.serverUrl = formattedUrl
-            apiProvider.initialize(formattedUrl)
-            _serverConfigured.value = true
-            checkSession()
+            _isLoading.value = true
+            _error.value = null
+            try {
+                val formattedUrl = if (url.startsWith("http")) url else "http://$url"
+                // Validar que termine en /
+                val baseUrl = if (formattedUrl.endsWith("/")) formattedUrl else "$formattedUrl/"
+                val apiUrl = "${baseUrl}api/"
+
+                sessionManager.serverUrl = apiUrl
+                apiProvider.initialize(apiUrl)
+
+                // Verificar que el servidor responde
+                val testResponse = apiProvider.getApi().getEventos()
+                if (testResponse.isSuccessful || testResponse.code() in 200..499) {
+                    // Cualquier respuesta HTTP válida significa que el servidor existe
+                    dataStoreManager.saveServerUrl(baseUrl)
+                    _serverConfigured.value = true
+                    checkSession()
+                } else {
+                    _error.value = "El servidor respondió con error: ${testResponse.code()}"
+                }
+            } catch (e: Exception) {
+                _error.value = "No se pudo conectar: ${e.message ?: "Verifica la IP y que el backend esté corriendo."}"
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
@@ -89,8 +109,8 @@ class AuthViewModel @Inject constructor(
             result.onSuccess {
                 _loginSuccess.value = it
                 _isLoggedIn.value = true
-                _userRole.value = it.usuario?.rol
-                _currentUser.value = it.usuario
+                _userRole.value = it.rol
+                _currentUser.value = sessionManager.currentUser
             }.onFailure {
                 _error.value = it.message
             }
@@ -108,8 +128,8 @@ class AuthViewModel @Inject constructor(
                 _loginSuccess.value = it
                 if (it.token != null) {
                     _isLoggedIn.value = true
-                    _userRole.value = it.usuario?.rol
-                    _currentUser.value = it.usuario
+                    _userRole.value = it.rol
+                    _currentUser.value = sessionManager.currentUser
                 }
             }.onFailure {
                 _error.value = it.message

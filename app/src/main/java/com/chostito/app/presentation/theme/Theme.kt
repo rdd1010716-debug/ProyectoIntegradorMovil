@@ -1,9 +1,13 @@
 package com.chostito.app.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 private val DarkColorScheme = darkColorScheme(
     primary = PurpleNeon,
@@ -18,12 +22,19 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun ChostitoTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
         colorScheme = DarkColorScheme,
         typography = ChostitoTypography,
-        content = content
+        content = {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                content()
+            }
+        }
     )
 }

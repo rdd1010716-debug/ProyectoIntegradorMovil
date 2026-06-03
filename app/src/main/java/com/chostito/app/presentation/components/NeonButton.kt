@@ -30,7 +30,7 @@ fun NeonButton(
         enabled = enabled,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
+            containerColor = PurpleNeon.copy(alpha = 0.85f),
             disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
         ),
         contentPadding = PaddingValues(vertical = 14.dp)

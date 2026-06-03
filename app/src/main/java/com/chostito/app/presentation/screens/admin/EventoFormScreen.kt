@@ -3,19 +3,15 @@ package com.chostito.app.presentation.screens.admin
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,9 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.chostito.app.presentation.components.GlassTextField
 import com.chostito.app.presentation.components.NeonButton
 import com.chostito.app.presentation.theme.TextPrimary
-import com.chostito.app.presentation.theme.TextSecondary
 import com.chostito.app.presentation.viewmodel.EventoViewModel
 
 @Composable
@@ -50,15 +46,15 @@ fun EventoFormScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            AdminTextField(value = titulo, onValueChange = { titulo = it }, label = "Título")
+            GlassTextField(value = titulo, onValueChange = { titulo = it }, label = "Título")
             Spacer(modifier = Modifier.height(12.dp))
-            AdminTextField(value = descripcion, onValueChange = { descripcion = it }, label = "Descripción")
+            GlassTextField(value = descripcion, onValueChange = { descripcion = it }, label = "Descripción")
             Spacer(modifier = Modifier.height(12.dp))
-            AdminTextField(value = fecha, onValueChange = { fecha = it }, label = "Fecha (YYYY-MM-DD)")
+            GlassTextField(value = fecha, onValueChange = { fecha = it }, label = "Fecha (YYYY-MM-DD)")
             Spacer(modifier = Modifier.height(12.dp))
-            AdminTextField(value = hora, onValueChange = { hora = it }, label = "Hora")
+            GlassTextField(value = hora, onValueChange = { hora = it }, label = "Hora")
             Spacer(modifier = Modifier.height(12.dp))
-            AdminTextField(value = imagenUrl, onValueChange = { imagenUrl = it }, label = "URL Imagen")
+            GlassTextField(value = imagenUrl, onValueChange = { imagenUrl = it }, label = "URL Imagen")
             Spacer(modifier = Modifier.height(24.dp))
             NeonButton(
                 text = "Crear Evento",
@@ -77,21 +73,4 @@ fun EventoFormScreen(
             )
         }
     }
-}
-
-@Composable
-private fun AdminTextField(value: String, onValueChange: (String) -> Unit, label: String) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label, color = TextSecondary) },
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = TextPrimary,
-            unfocusedTextColor = TextPrimary,
-            focusedBorderColor = com.chostito.app.presentation.theme.PurpleNeon,
-            unfocusedBorderColor = TextSecondary.copy(alpha = 0.3f)
-        )
-    )
 }

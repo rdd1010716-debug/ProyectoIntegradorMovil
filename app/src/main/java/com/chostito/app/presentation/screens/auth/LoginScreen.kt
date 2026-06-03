@@ -4,14 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,13 +23,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.chostito.app.presentation.components.GlassTextField
 import com.chostito.app.presentation.components.LoadingIndicator
 import com.chostito.app.presentation.components.NeonButton
 import com.chostito.app.presentation.navigation.Screen
 import com.chostito.app.presentation.theme.CyanNeon
 import com.chostito.app.presentation.theme.PurpleNeon
 import com.chostito.app.presentation.theme.TextPrimary
-import com.chostito.app.presentation.theme.TextSecondary
 import com.chostito.app.presentation.viewmodel.AuthViewModel
 
 @Composable
@@ -65,35 +60,17 @@ fun LoginScreen(
         if (isLoading) {
             LoadingIndicator()
         } else {
-            OutlinedTextField(
+            GlassTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email", color = TextSecondary) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary,
-                    focusedBorderColor = PurpleNeon,
-                    unfocusedBorderColor = TextSecondary.copy(alpha = 0.3f)
-                )
+                label = "Email"
             )
             Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
+            GlassTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Contraseña", color = TextSecondary) },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary,
-                    focusedBorderColor = PurpleNeon,
-                    unfocusedBorderColor = TextSecondary.copy(alpha = 0.3f)
-                )
+                label = "Contraseña",
+                visualTransformation = PasswordVisualTransformation()
             )
             if (error != null) {
                 Spacer(modifier = Modifier.height(8.dp))

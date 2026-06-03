@@ -6,8 +6,7 @@ import com.chostito.app.data.remote.ApiProvider
 import com.chostito.app.data.remote.dto.LoginRequest
 import com.chostito.app.data.remote.dto.LoginResponseDto
 import com.chostito.app.data.remote.dto.RegisterRequest
-import com.chostito.app.domain.model.Usuario
-import com.chostito.app.domain.model.toDomain
+import com.chostito.app.data.remote.dto.UserDto
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -28,7 +27,15 @@ class AuthRepository @Inject constructor(
                     dataStoreManager.saveToken(token)
                     sessionManager.jwtToken = token
                 }
-                body.usuario?.let { user ->
+                body.id?.let {
+                    val user = UserDto(
+                        id = it,
+                        nombre = body.nombre ?: "",
+                        email = body.email ?: "",
+                        telefono = body.telefono,
+                        rol = body.rol ?: "Cliente",
+                        fotoUrl = body.fotoUrl
+                    )
                     dataStoreManager.saveUserJson(Gson().toJson(user))
                     sessionManager.currentUser = user
                 }
@@ -45,7 +52,24 @@ class AuthRepository @Inject constructor(
         return try {
             val response = apiProvider.getApi().register(request)
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
+                val body = response.body()!!
+                body.token?.let { token ->
+                    dataStoreManager.saveToken(token)
+                    sessionManager.jwtToken = token
+                }
+                body.id?.let {
+                    val user = UserDto(
+                        id = it,
+                        nombre = body.nombre ?: "",
+                        email = body.email ?: "",
+                        telefono = body.telefono,
+                        rol = body.rol ?: "Cliente",
+                        fotoUrl = body.fotoUrl
+                    )
+                    dataStoreManager.saveUserJson(Gson().toJson(user))
+                    sessionManager.currentUser = user
+                }
+                Result.success(body)
             } else {
                 Result.failure(Exception(response.errorBody()?.string() ?: "Error de registro"))
             }
@@ -64,7 +88,7 @@ class AuthRepository @Inject constructor(
         val userJson = dataStoreManager.userJson.first()
         return if (!token.isNullOrBlank() && !userJson.isNullOrBlank()) {
             sessionManager.jwtToken = token
-            val user = Gson().fromJson(userJson, com.chostito.app.data.remote.dto.UserDto::class.java)
+            val user = Gson().fromJson(userJson, UserDto::class.java)
             sessionManager.currentUser = user
             Pair(true, user?.rol)
         } else {

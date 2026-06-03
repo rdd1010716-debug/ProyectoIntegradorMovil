@@ -19,8 +19,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.chostito.app.presentation.components.EventCard
+import com.chostito.app.presentation.components.GlassTextField
 import com.chostito.app.presentation.components.LoadingIndicator
 import com.chostito.app.presentation.navigation.Screen
 import com.chostito.app.presentation.theme.CyanNeon
@@ -63,21 +63,14 @@ fun HomeScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        OutlinedTextField(
+        GlassTextField(
             value = searchQuery,
             onValueChange = {
                 searchQuery = it
                 viewModel.loadEventos(selectedCategoria, if (it.isBlank()) null else it)
             },
-            label = { Text("Buscar eventos...", color = TextSecondary) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = TextPrimary,
-                unfocusedTextColor = TextPrimary,
-                focusedBorderColor = PurpleNeon,
-                unfocusedBorderColor = TextSecondary.copy(alpha = 0.3f)
-            )
+            label = "Buscar eventos...",
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
