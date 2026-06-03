@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ESPACIO RESERVADO PARA EL LOGO DE CHOSTITO -->
+<!-- Reemplaza este archivo con tu logo (logo.png o logo.xml) -->
+<!-- Por ahora es un placeholder transparente -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@android:color/transparent" />
+</shape>

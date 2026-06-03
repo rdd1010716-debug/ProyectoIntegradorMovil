@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Chostito</string>
+    <string name="server_url_hint">IP del servidor (ej: 192.168.1.50:5027)</string>
+    <string name="save">Guardar</string>
+    <string name="login">Iniciar Sesión</string>
+    <string name="register">Registrarse</string>
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="name">Nombre completo</string>
+    <string name="phone">Teléfono</string>
+    <string name="role_cliente">Cliente</string>
+    <string name="role_organizador">Organizador</string>
+    <string name="home">Inicio</string>
+    <string name="favorites">Favoritos</string>
+    <string name="reservations">Mis Reservas</string>
+    <string name="profile">Perfil</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="my_events">Mis Eventos</string>
+    <string name="scan_qr">Escanear</string>
+    <string name="no_events">No hay eventos disponibles</string>
+    <string name="buy_tickets">Comprar Entradas</string>
+    <string name="add_favorite">Agregar a Favoritos</string>
+    <string name="remove_favorite">Quitar de Favoritos</string>
+    <string name="reserve">Reservar</string>
+    <string name="pay">Pagar</string>
+    <string name="scan">Escanear QR</string>
+    <string name="logout">Cerrar Sesión</string>
+</resources>
