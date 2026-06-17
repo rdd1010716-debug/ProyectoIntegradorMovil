@@ -65,6 +65,13 @@ dependencies {
     // ZXing (QR)
     implementation(libs.zxing.core)
     
+    // CameraX
+    val camerax_version = "1.4.0"
+    implementation("androidx.camera:camera-camera2:$camerax_version")
+    implementation("androidx.camera:camera-lifecycle:$camerax_version")
+    implementation("androidx.camera:camera-view:$camerax_version")
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    
     // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)
     

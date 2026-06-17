@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,8 +22,6 @@ import coil.compose.AsyncImage
 import com.example.chostitomobile.data.model.Evento
 import com.example.chostitomobile.ui.theme.*
 import com.example.chostitomobile.ui.viewmodel.EventoViewModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(
@@ -41,94 +40,92 @@ fun HomeScreen(
         viewModel.cargarEventos()
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Header
-            Text(
-                text = "Eventos disponibles",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            // Search bar
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = {
-                    searchQuery = it
-                    onSearch(it)
-                },
-                placeholder = { Text("Buscar eventos...", color = TextSecondary) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Primary) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary,
-                    focusedBorderColor = Primary,
-                    unfocusedBorderColor = SurfaceLight
+    Scaffold(
+        containerColor = Background,
+        topBar = {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Eventos disponibles",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = TextPrimary
                 )
-            )
-
-            // Categorías
-            if (categorias.isNotEmpty()) {
-            PrimaryScrollableTabRow(
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = {
+                        searchQuery = it
+                        onSearch(it)
+                    },
+                    placeholder = { Text("¿A dónde quieres ir?", color = TextSecondary) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Primary) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary,
+                        focusedBorderColor = Primary,
+                        unfocusedBorderColor = SurfaceLight,
+                        focusedContainerColor = Surface,
+                        unfocusedContainerColor = Surface
+                    )
+                )
+            }
+        }
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+            // Categorías con mejor diseño
+            ScrollableTabRow(
                 selectedTabIndex = if (selectedCategoria == "Todos") 0 else categorias.indexOfFirst { it.nombre == selectedCategoria } + 1,
                 containerColor = Background,
                 contentColor = Primary,
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                    Tab(
-                        selected = selectedCategoria == "Todos",
-                        onClick = { selectedCategoria = "Todos"; viewModel.filtrarPorCategoria("Todos") },
-                        text = { Text("Todos") }
-                    )
-                    categorias.forEach { cat ->
-                        Tab(
-                            selected = selectedCategoria == cat.nombre,
-                            onClick = { selectedCategoria = cat.nombre; viewModel.filtrarPorCategoria(cat.nombre) },
-                            text = { Text(cat.nombre) }
+                edgePadding = 16.dp,
+                divider = {},
+                indicator = { tabPositions ->
+                    if (tabPositions.isNotEmpty()) {
+                        TabRowDefaults.SecondaryIndicator(
+                            Modifier.tabIndicatorOffset(tabPositions[if (selectedCategoria == "Todos") 0 else categorias.indexOfFirst { it.nombre == selectedCategoria } + 1]),
+                            color = Primary
                         )
                     }
+                }
+            ) {
+                Tab(
+                    selected = selectedCategoria == "Todos",
+                    onClick = { selectedCategoria = "Todos"; viewModel.filtrarPorCategoria("Todos") },
+                    text = { Text("Todos", fontWeight = if (selectedCategoria == "Todos") FontWeight.Bold else FontWeight.Normal) }
+                )
+                categorias.forEach { cat ->
+                    Tab(
+                        selected = selectedCategoria == cat.nombre,
+                        onClick = { selectedCategoria = cat.nombre; viewModel.filtrarPorCategoria(cat.nombre) },
+                        text = { Text(cat.nombre, fontWeight = if (selectedCategoria == cat.nombre) FontWeight.Bold else FontWeight.Normal) }
+                    )
                 }
             }
 
             if (loading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Primary)
                 }
             } else if (error != null) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(error, color = Error, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 }
-            } else if (eventos.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No hay eventos disponibles", color = TextSecondary)
-                }
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(eventos) { evento ->
-                        EventoCard(evento = evento, onClick = { onEventoClick(evento.id) })
+                if (eventos.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No hay eventos en esta categoría", color = TextSecondary)
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(eventos) { evento ->
+                            EventoCard(evento = evento, onClick = { onEventoClick(evento.id) })
+                        }
                     }
                 }
             }
@@ -142,57 +139,66 @@ fun EventoCard(evento: Evento, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column {
-            if (!evento.imagenUrl.isNullOrEmpty()) {
-                AsyncImage(
-                    model = evento.imagenUrl,
-                    contentDescription = evento.titulo,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-                    contentScale = ContentScale.Crop
-                )
+            Box {
+                if (!evento.imagenUrl.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = evento.imagenUrl,
+                        contentDescription = evento.titulo,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                // Badge de categoría
+                Surface(
+                    modifier = Modifier.padding(12.dp).align(Alignment.TopStart),
+                    color = Primary.copy(alpha = 0.9f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = evento.categorias?.nombre ?: evento.categoria ?: "Evento",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        fontSize = 10.sp,
+                        color = TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
+            
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = evento.categoria ?: "Evento",
-                    fontSize = 12.sp,
-                    color = Primary,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
                     text = evento.titulo,
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary
                 )
-                if (!evento.eslogan.isNullOrEmpty()) {
-                    Text(
-                        text = evento.eslogan,
-                        fontSize = 14.sp,
-                        color = TextSecondary,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
+                Text(
+                    text = "📅 ${evento.fecha}",
+                    fontSize = 13.sp,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
                 Row(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "${evento.lugares?.nombre ?: evento.lugar ?: "Sin lugar"}, ${evento.lugares?.ciudad ?: evento.ciudad ?: ""}",
+                        text = "📍 ${evento.lugares?.nombre ?: evento.lugar ?: "Lugar no def."}",
                         fontSize = 12.sp,
-                        color = TextSecondary
+                        color = TextLight,
+                        modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = "Desde Bs ${evento.precioMinimo.toInt()}",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
+                        text = "Bs ${evento.precioMinimo.toInt()}",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
                         color = Secondary
                     )
                 }

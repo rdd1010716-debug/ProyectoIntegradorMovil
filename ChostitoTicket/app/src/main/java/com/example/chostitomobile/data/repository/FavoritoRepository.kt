@@ -30,7 +30,7 @@ class FavoritoRepository(private val client: SupabaseClient) {
         client.client.post("${SupabaseClient.SUPABASE_URL}/rest/v1/favoritos") {
             header("Authorization", "Bearer $token")
             header("apikey", SupabaseClient.SUPABASE_ANON_KEY)
-            setBody(mapOf("id_usuario" to userId, "id_evento" to eventoId))
+            setBody(FavoritoRequest(idUsuario = userId, idEvento = eventoId))
         }
     }
 

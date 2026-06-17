@@ -16,6 +16,8 @@ class EventoViewModel(private val repository: EventoRepository) : ViewModel() {
     private val _eventos = mutableStateOf<List<Evento>>(emptyList())
     val eventos: State<List<Evento>> = _eventos
 
+    private val _allEventos = mutableStateOf<List<Evento>>(emptyList())
+
     private val _categorias = mutableStateOf<List<Categoria>>(emptyList())
     val categorias: State<List<Categoria>> = _categorias
 
@@ -30,7 +32,9 @@ class EventoViewModel(private val repository: EventoRepository) : ViewModel() {
             _loading.value = true
             _error.value = null
             try {
-                _eventos.value = repository.getEventos(estado)
+                val data = repository.getEventos(estado)
+                _allEventos.value = data
+                _eventos.value = data
                 _categorias.value = repository.getCategorias()
             } catch (e: Exception) {
                 _error.value = e.message ?: "Error al cargar eventos"
@@ -42,33 +46,23 @@ class EventoViewModel(private val repository: EventoRepository) : ViewModel() {
 
     fun buscarEventos(query: String) {
         if (query.isEmpty()) {
-            cargarEventos()
+            _eventos.value = _allEventos.value
             return
         }
-        viewModelScope.launch {
-            _loading.value = true
-            try {
-                val todos = repository.getEventos()
-                _eventos.value = todos.filter {
-                    it.titulo.contains(query, ignoreCase = true) ||
-                    it.lugar?.contains(query, ignoreCase = true) == true
-                }
-            } catch (e: Exception) {
-                _error.value = e.message
-            } finally {
-                _loading.value = false
-            }
+        _eventos.value = _allEventos.value.filter {
+            it.titulo.contains(query, ignoreCase = true) ||
+            it.lugares?.nombre?.contains(query, ignoreCase = true) == true ||
+            it.lugar?.contains(query, ignoreCase = true) == true
         }
     }
 
     fun filtrarPorCategoria(categoria: String) {
         if (categoria == "Todos") {
-            cargarEventos()
+            _eventos.value = _allEventos.value
             return
         }
-        viewModelScope.launch {
-            val todos = repository.getEventos()
-            _eventos.value = todos.filter { it.categoria == categoria }
+        _eventos.value = _allEventos.value.filter { 
+            it.categorias?.nombre == categoria || it.categoria == categoria
         }
     }
 

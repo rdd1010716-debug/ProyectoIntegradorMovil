@@ -120,9 +120,13 @@ fun EventoDetalleScreen(
                     IconButton(
                         onClick = {
                             scope.launch {
-                                if (isFav) favRepo.eliminarFavorito(eventoId)
-                                else favRepo.agregarFavorito(eventoId)
-                                isFav = !isFav
+                                try {
+                                    if (isFav) favRepo.eliminarFavorito(eventoId)
+                                    else favRepo.agregarFavorito(eventoId)
+                                    isFav = !isFav
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }
                         },
                         modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)

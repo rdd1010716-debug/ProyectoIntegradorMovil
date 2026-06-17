@@ -1,12 +1,20 @@
 package com.example.chostitomobile.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,101 +38,117 @@ fun AdminDashboardScreen(user: Perfil?) {
         viewModel.cargarStats()
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .padding(24.dp)
-    ) {
-        if (loading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = Primary)
-        } else {
-            Column(
+    Scaffold(
+        containerColor = Background
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .padding(24.dp)
+        ) {
+            Text(
+                text = "Panel de Control",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Primary,
+                letterSpacing = 1.sp
+            )
+            Text(
+                text = "Hola, ${user?.nombre?.split(" ")?.firstOrNull() ?: "Administrador"}",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Black,
+                color = TextPrimary
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Tarjetas de Estadísticas Pro
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                StatCardPro("Eventos", "${stats?.totalEventos ?: 0}", Icons.Default.Event, Primary, Modifier.weight(1f))
+                StatCardPro("Ganancia", "Bs ${stats?.totalRecaudado?.toInt() ?: 0}", Icons.Default.Payments, Success, Modifier.weight(1f))
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Gestión de Negocio",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val menuItems = listOf(
+                AdminMenuItem("Mis Eventos", Icons.Default.ConfirmationNumber, Primary),
+                AdminMenuItem("Ventas", Icons.Default.BarChart, Secondary),
+                AdminMenuItem("Usuarios", Icons.Default.People, Success),
+                AdminMenuItem("Lugares", Icons.Default.LocationOn, Warning),
+                AdminMenuItem("Categorías", Icons.Default.Category, PrimaryLight),
+                AdminMenuItem("Ajustes", Icons.Default.Settings, TextSecondary)
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                Text(
-                    text = "Panel de control",
-                    fontSize = 16.sp,
-                    color = TextSecondary
-                )
-                Text(
-                    text = "Hola, ${user?.nombre?.split(" ")?.firstOrNull() ?: "Admin"}",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-                Text(
-                    text = if (user?.rol == "Admin") "Administrador" else "Organizador",
-                    fontSize = 14.sp,
-                    color = Primary,
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
-
-                // Stats cards
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    StatCard("Eventos", "${stats?.totalEventos ?: 0}", "🎪")
-                    StatCard("Entradas", "${stats?.entradasVendidas ?: 0}", "🎫")
-                    StatCard("Bs", "${stats?.totalRecaudado?.toInt() ?: 0}", "💰")
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Text(
-                    text = "Acciones rápidas",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                ActionButton("📂 Categorías", Primary)
-                Spacer(modifier = Modifier.height(8.dp))
-                ActionButton("🏢 Lugares", Secondary)
-                Spacer(modifier = Modifier.height(8.dp))
-                if (user?.rol == "Admin") {
-                    ActionButton("👥 Usuarios", PrimaryLight)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ActionButton("📊 Ganancias", Success)
+                items(menuItems) { item ->
+                    AdminMenuCard(item)
                 }
             }
         }
     }
 }
 
+data class AdminMenuItem(val title: String, val icon: ImageVector, val color: Color)
+
 @Composable
-private fun StatCard(label: String, value: String, icon: String) {
+private fun StatCardPro(label: String, value: String, icon: ImageVector, color: Color, modifier: Modifier) {
     Card(
-        modifier = Modifier
-            .width(100.dp)
-            .height(100.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Surface)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(icon, fontSize = 24.sp)
-            Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-            Text(label, fontSize = 10.sp, color = TextSecondary)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(28.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(value, fontSize = 22.sp, fontWeight = FontWeight.Black, color = TextPrimary)
+            Text(label, fontSize = 12.sp, color = TextSecondary)
         }
     }
 }
 
 @Composable
-private fun ActionButton(text: String, color: androidx.compose.ui.graphics.Color) {
-    Button(
-        onClick = { },
+private fun AdminMenuCard(item: AdminMenuItem) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = color)
+            .height(120.dp)
+            .clickable { },
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Surface)
     ) {
-        Text(text, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Surface(
+                color = item.color.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    item.icon,
+                    contentDescription = null,
+                    tint = item.color,
+                    modifier = Modifier.padding(8.dp).size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(item.title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        }
     }
 }

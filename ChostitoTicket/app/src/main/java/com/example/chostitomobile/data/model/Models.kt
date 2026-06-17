@@ -130,6 +130,12 @@ data class Favorito(
 )
 
 @Serializable
+data class FavoritoRequest(
+    @SerialName("id_usuario") val idUsuario: String,
+    @SerialName("id_evento") val idEvento: Int
+)
+
+@Serializable
 data class LoginRequest(
     val email: String,
     val password: String
